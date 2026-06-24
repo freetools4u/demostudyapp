@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-        <title>Motion in a Straight Line 05 : Homework Questions || Questions on Distance and Displacement || Speed and Velocity || Questions on Speed and Velocity</title>
+        <title>Lecture Player</title>
         <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.min.js"></script>
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -18,6 +18,1464 @@
                 user-select: none
             }
 
+            :root {
+                --accent: #5a4bda;
+                --bg: #000;
+                --surface: #111118;
+                --surface2: #1c1c27;
+                --border: rgba(255,255,255,.1);
+                --text: #e8e8f0;
+                --muted: #7070a0;
+                --note: #3ecfcf;
+                --dpp: #ff9f43
+            }
+
+            html,body {
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+                background: var(--bg);
+                font-family: 'DM Sans',-apple-system,sans-serif;
+                color: var(--text)
+            }
+
+            #shell {
+                position: fixed;
+                inset: 0;
+                display: flex;
+                flex-direction: column;
+                background: var(--bg);
+                overflow: hidden
+            }
+
+            #main-row {
+                flex: 1;
+                min-height: 0;
+                display: flex;
+                flex-direction: row;
+                overflow: hidden
+            }
+
+            #video-col {
+                flex: 1;
+                min-width: 0;
+                min-height: 0;
+                position: relative;
+                background: #000;
+                overflow: hidden
+            }
+
+            #vid-box {
+                position: absolute;
+                inset: 0;
+                background: #000;
+                display: flex;
+                align-items: center;
+                justify-content: center
+            }
+
+            video {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                background: #000;
+                display: block;
+                outline: none;
+                pointer-events: none
+            }
+
+            .ov {
+                position: absolute;
+                inset: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                z-index: 10
+            }
+
+            #ovLoad {
+                background: rgba(0,0,0,.82)
+            }
+
+            #ovLoad.off {
+                display: none
+            }
+
+            .spinner {
+                width: 40px;
+                height: 40px;
+                border: 3px solid rgba(90,75,218,.18);
+                border-top-color: var(--accent);
+                border-radius: 50%;
+                animation: spin .8s linear infinite
+            }
+
+            #ovLoad p {
+                font-size: 13px;
+                color: rgba(255,255,255,.65)
+            }
+
+            #ovErr {
+                background: rgba(0,0,0,.88);
+                display: none;
+                padding: 20px;
+                text-align: center
+            }
+
+            #ovErr.on {
+                display: flex
+            }
+
+            #ovErr p {
+                font-size: 14px;
+                color: #ff6584;
+                max-width: 300px;
+                line-height: 1.5
+            }
+
+            #ovErr button {
+                padding: 8px 22px;
+                background: var(--accent);
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                font-size: 14px;
+                cursor: pointer;
+                font-family: inherit;
+                margin-top: 4px
+            }
+
+            #bufSpin {
+                position: absolute;
+                inset: 0;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                z-index: 8;
+                pointer-events: none
+            }
+
+            #bufSpin.on {
+                display: flex
+            }
+
+            #bufSpin::after {
+                content: '';
+                width: 42px;
+                height: 42px;
+                border-radius: 50%;
+                border: 3px solid rgba(90,75,218,.18);
+                border-top-color: var(--accent);
+                animation: spin .75s linear infinite
+            }
+
+            #ctrl-overlay {
+                position: absolute;
+                inset: 0;
+                z-index: 20;
+                display: flex;
+                flex-direction: column;
+                transition: opacity .35s ease
+            }
+
+            #ctrl-overlay.visible {
+                opacity: 1;
+                pointer-events: auto
+            }
+
+            #ctrl-overlay.hidden {
+                opacity: 0;
+                pointer-events: none
+            }
+
+            #tap-shield {
+                position: absolute;
+                inset: 0;
+                z-index: 19;
+                background: transparent;
+                cursor: pointer;
+                display: none
+            }
+
+            #tap-shield.on {
+                display: block
+            }
+
+            #player-header {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 14px;
+                background: linear-gradient(rgba(0,0,0,.72) 0%,transparent 100%);
+                flex-shrink: 0
+            }
+
+            .hdr-back {
+                background: none;
+                border: none;
+                color: #fff;
+                cursor: pointer;
+                padding: 6px;
+                display: flex;
+                align-items: center;
+                border-radius: 8px;
+                flex-shrink: 0;
+                transition: transform .12s
+            }
+
+            .hdr-back:active {
+                transform: scale(.88)
+            }
+
+            .hdr-back svg {
+                width: 22px;
+                height: 22px;
+                stroke: #fff;
+                fill: none;
+                stroke-width: 2;
+                stroke-linecap: round;
+                stroke-linejoin: round
+            }
+
+            #player-title {
+                flex: 1;
+                min-width: 0;
+                font-size: 14px;
+                font-weight: 500;
+                color: #fff;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis
+            }
+
+            #tdBtn {
+                background: none;
+                border: none;
+                color: #fff;
+                cursor: pointer;
+                padding: 6px;
+                display: flex;
+                align-items: center;
+                border-radius: 8px;
+                flex-shrink: 0;
+                position: relative
+            }
+
+            #tdBtn>svg {
+                width: 22px;
+                height: 22px;
+                fill: #fff
+            }
+
+            #tdMenu {
+                position: absolute;
+                top: calc(100% + 2px);
+                right: 0;
+                background: rgba(12,12,20,.98);
+                border: 1px solid rgba(255,255,255,.12);
+                border-radius: 12px;
+                overflow: hidden;
+                min-width: 190px;
+                z-index: 200;
+                display: none;
+                box-shadow: 0 8px 32px rgba(0,0,0,.9)
+            }
+
+            #tdMenu.on {
+                display: block
+            }
+
+            .tdm-row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 14px 16px;
+                color: #fff;
+                font-size: 14px;
+                cursor: pointer;
+                border-bottom: 1px solid rgba(255,255,255,.07)
+            }
+
+            .tdm-row:last-child {
+                border-bottom: none
+            }
+
+            .tdm-row:active {
+                background: rgba(255,255,255,.08)
+            }
+
+            .tdm-row svg {
+                width: 18px;
+                height: 18px;
+                flex-shrink: 0;
+                stroke: currentColor;
+                fill: none
+            }
+
+            #ctrl-mid {
+                flex: 1
+            }
+
+            #player-footer {
+                flex-shrink: 0;
+                background: linear-gradient(transparent 0%,rgba(0,0,0,.82) 100%);
+                padding: 6px 0 10px
+            }
+
+            body.yt-mode #player-footer,body.yt-mode #bufSpin,body.yt-mode #ovLoad,body.yt-mode #ovErr {
+                display: none!important
+            }
+
+            .prog-wrap {
+                padding: 0 14px 6px
+            }
+
+            .time-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 6px
+            }
+
+            .t-left {
+                display: flex;
+                align-items: center;
+                gap: 6px
+            }
+
+            .t-time {
+                color: #fff;
+                font-size: 13px;
+                font-family: monospace;
+                font-weight: 500
+            }
+
+            .spd-badge {
+                background: rgba(255,255,255,.92);
+                color: #000;
+                font-size: 10px;
+                font-weight: 800;
+                padding: 1px 5px;
+                border-radius: 4px;
+                font-family: sans-serif
+            }
+
+            .live-badge {
+                display: none;
+                align-items: center;
+                gap: 4px;
+                font-size: 11px;
+                font-weight: 700;
+                color: #fff
+            }
+
+            .live-badge.on {
+                display: flex
+            }
+
+            .live-dot {
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                background: red;
+                animation: blink 1.4s ease infinite
+            }
+
+            .bar-wrap {
+                position: relative;
+                height: 22px;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                touch-action: none
+            }
+
+            .bar-bg {
+                position: absolute;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: rgba(255,255,255,.2);
+                border-radius: 2px;
+                overflow: hidden
+            }
+
+            .bar-buf {
+                height: 100%;
+                background: rgba(255,255,255,.3);
+                position: absolute;
+                left: 0;
+                border-radius: 2px
+            }
+
+            .bar-fill {
+                height: 100%;
+                background: var(--accent);
+                position: absolute;
+                left: 0;
+                border-radius: 2px
+            }
+
+            .bar-thumb {
+                position: absolute;
+                top: 50%;
+                transform: translate(-50%,-50%);
+                width: 14px;
+                height: 14px;
+                background: #fff;
+                border-radius: 50%;
+                pointer-events: none;
+                box-shadow: 0 0 5px rgba(0,0,0,.6);
+                will-change: left
+            }
+
+            .bar-wrap:hover .bar-thumb {
+                transform: translate(-50%,-50%) scale(1.3)
+            }
+
+            .bar-input {
+                position: absolute;
+                inset: 0;
+                opacity: 0;
+                cursor: pointer;
+                width: 100%;
+                height: 100%
+            }
+
+            .btn-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 6px
+            }
+
+            .btn-l,.btn-r {
+                display: flex;
+                align-items: center
+            }
+
+            .cbtn {
+                background: none;
+                border: none;
+                color: #fff;
+                cursor: pointer;
+                min-width: 44px;
+                min-height: 44px;
+                padding: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 8px;
+                flex-shrink: 0;
+                outline: none;
+                transition: transform .12s,opacity .12s
+            }
+
+            .cbtn:active {
+                transform: scale(.85);
+                opacity: .65
+            }
+
+            .vol-grp {
+                display: flex;
+                align-items: center
+            }
+
+            .vol-range {
+                -webkit-appearance: none;
+                width: 0;
+                height: 4px;
+                border-radius: 2px;
+                background: rgba(255,255,255,.25);
+                outline: none;
+                transition: width .2s;
+                cursor: pointer;
+                margin-left: 0;
+                overflow: hidden
+            }
+
+            .vol-grp:hover .vol-range {
+                width: 70px;
+                margin-left: 6px
+            }
+
+            .vol-range::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                width: 0;
+                height: 0
+            }
+
+            #side-panel {
+                width: 380px;
+                background: var(--surface);
+                border-left: 1px solid var(--border);
+                display: flex;
+                flex-direction: column;
+                flex-shrink: 0;
+                z-index: 100;
+                overflow: hidden
+            }
+
+            #bottom-panel {
+                height: 0;
+                background: var(--surface);
+                border-top: 1px solid var(--border);
+                display: none;
+                flex-direction: column;
+                z-index: 100;
+                overflow: hidden;
+                transition: height .3s ease
+            }
+
+            .layout-mobile #side-panel {
+                display: none
+            }
+
+            .layout-mobile #bottom-panel {
+                display: flex
+            }
+
+            .layout-mobile #bottom-panel.on {
+                height: 65%
+            }
+
+            .panel-inner {
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+                overflow: hidden
+            }
+
+            .panel-hdr {
+                padding: 14px 18px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                border-bottom: 1px solid var(--border);
+                flex-shrink: 0
+            }
+
+            .panel-hdr-title {
+                font-size: 15px;
+                font-weight: 700;
+                color: #fff
+            }
+
+            .panel-close {
+                background: none;
+                border: none;
+                color: var(--muted);
+                cursor: pointer;
+                padding: 4px;
+                display: flex;
+                align-items: center
+            }
+
+            .panel-close svg {
+                width: 20px;
+                height: 20px;
+                stroke: currentColor;
+                fill: none;
+                stroke-width: 2.5
+            }
+
+            #panelTabsArea {
+                display: flex;
+                border-bottom: 1px solid var(--border);
+                flex-shrink: 0
+            }
+
+            .ptab {
+                flex: 1;
+                padding: 12px;
+                text-align: center;
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--muted);
+                cursor: pointer;
+                transition: color .2s,background .2s;
+                position: relative
+            }
+
+            .ptab.active {
+                color: #fff;
+                background: rgba(255,255,255,.03)
+            }
+
+            .ptab.active::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 20%;
+                right: 20%;
+                height: 2px;
+                background: var(--accent);
+                border-radius: 2px 2px 0 0
+            }
+
+            #mainPanelBody {
+                flex: 1;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch
+            }
+
+            .tl-list {
+                padding: 12px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px
+            }
+
+            .tl-card {
+                background: var(--surface2);
+                border-radius: 12px;
+                overflow: hidden;
+                cursor: pointer;
+                position: relative;
+                border: 1px solid transparent;
+                transition: border-color .2s,transform .2s
+            }
+
+            .tl-card:active {
+                transform: scale(.98)
+            }
+
+            .tl-card.active {
+                border-color: var(--accent)
+            }
+
+            .tl-img {
+                width: 100%;
+                aspect-ratio: 16/9;
+                background: #000;
+                display: block;
+                object-fit: cover
+            }
+
+            .tl-ov {
+                padding: 10px 12px;
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 10px
+            }
+
+            .tl-name {
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--text);
+                line-height: 1.4;
+                flex: 1
+            }
+
+            .tl-ts {
+                font-size: 11px;
+                font-weight: 700;
+                color: var(--accent);
+                background: rgba(90,75,218,.15);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-family: monospace;
+                flex-shrink: 0
+            }
+
+            .tl-cur-badge {
+                position: absolute;
+                top: 8px;
+                left: 8px;
+                background: var(--accent);
+                color: #fff;
+                font-size: 10px;
+                font-weight: 700;
+                padding: 3px 8px;
+                border-radius: 6px;
+                display: none;
+                box-shadow: 0 2px 8px rgba(0,0,0,.4)
+            }
+
+            .tl-card.active .tl-cur-badge {
+                display: block
+            }
+
+            .acc {
+                border-bottom: 1px solid var(--border)
+            }
+
+            .acc-hdr {
+                padding: 16px 18px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                cursor: pointer;
+                transition: background .2s
+            }
+
+            .acc-hdr:active {
+                background: rgba(255,255,255,.03)
+            }
+
+            .acc-hl {
+                display: flex;
+                align-items: center;
+                gap: 12px
+            }
+
+            .acc-ic {
+                width: 32px;
+                height: 32px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0
+            }
+
+            .acc-ic svg {
+                width: 18px;
+                height: 18px
+            }
+
+            .ni {
+                background: rgba(62,207,207,.15)
+            }
+
+            .ni svg {
+                fill: var(--note)
+            }
+
+            .di {
+                background: rgba(255,159,67,.15)
+            }
+
+            .di svg {
+                fill: var(--dpp)
+            }
+
+            .acc-title {
+                font-size: 13px;
+                font-weight: 700;
+                letter-spacing: .6px;
+                text-transform: uppercase
+            }
+
+            .nt {
+                color: var(--note)
+            }
+
+            .dt {
+                color: var(--dpp)
+            }
+
+            .acc-cnt {
+                font-size: 10px;
+                padding: 1px 6px;
+                border-radius: 20px
+            }
+
+            .nc {
+                background: rgba(62,207,207,.12);
+                color: var(--note)
+            }
+
+            .dc {
+                background: rgba(255,159,67,.12);
+                color: var(--dpp)
+            }
+
+            .acc-chev {
+                width: 16px;
+                height: 16px;
+                color: var(--muted);
+                transition: transform .25s;
+                flex-shrink: 0
+            }
+
+            .acc-chev svg {
+                width: 16px;
+                height: 16px;
+                stroke: currentColor;
+                fill: none
+            }
+
+            .acc.open .acc-chev {
+                transform: rotate(180deg)
+            }
+
+            .acc-body {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height .3s cubic-bezier(.4,0,.2,1)
+            }
+
+            .acc.open .acc-body {
+                max-height: 2000px
+            }
+
+            .acc-inner {
+                border-top: 1px solid var(--border)
+            }
+
+            .att-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 14px;
+                border-bottom: 1px solid rgba(255,255,255,.05)
+            }
+
+            .att-item:last-child {
+                border-bottom: none
+            }
+
+            .att-dot {
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                flex-shrink: 0
+            }
+
+            .nd {
+                background: var(--note)
+            }
+
+            .dd {
+                background: var(--dpp)
+            }
+
+            .att-name {
+                flex: 1;
+                font-size: 13px;
+                color: var(--text);
+                line-height: 1.4;
+                word-break: break-word;
+                min-width: 0
+            }
+
+            .att-actions {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                flex-shrink: 0
+            }
+
+            .att-btn {
+                width: 32px;
+                height: 32px;
+                border-radius: 7px;
+                border: 1px solid rgba(255,255,255,.12);
+                background: rgba(255,255,255,.06);
+                color: rgba(255,255,255,.75);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background .12s,border-color .12s,color .12s;
+                flex-shrink: 0
+            }
+
+            .att-btn:active {
+                background: var(--accent);
+                border-color: var(--accent);
+                color: #fff
+            }
+
+            .att-btn svg {
+                width: 15px;
+                height: 15px;
+                stroke: currentColor;
+                fill: none;
+                stroke-width: 1.8;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+                pointer-events: none
+            }
+
+            .att-btn.preview:hover {
+                background: rgba(62,207,207,.15);
+                border-color: var(--note);
+                color: var(--note)
+            }
+
+            .att-btn.open-tab:hover {
+                background: rgba(90,75,218,.18);
+                border-color: var(--accent);
+                color: #a89dff
+            }
+
+            .att-btn.download:hover {
+                background: rgba(255,159,67,.15);
+                border-color: var(--dpp);
+                color: var(--dpp)
+            }
+
+            .pdf-preview-wrap {
+                display: flex;
+                flex-direction: column;
+                height: 100%
+            }
+
+            .pdf-preview-topbar {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 14px;
+                border-bottom: 1px solid var(--border);
+                flex-shrink: 0
+            }
+
+            .pdf-back-btn {
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 4px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                font-weight: 600;
+                color: #fff;
+                border-radius: 6px
+            }
+
+            .pdf-back-btn svg {
+                width: 16px;
+                height: 16px;
+                stroke: currentColor;
+                fill: none;
+                stroke-width: 2.5
+            }
+
+            .pdf-preview-title {
+                flex: 1;
+                min-width: 0;
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis
+            }
+
+            .pdf-frame-container {
+                flex: 1;
+                overflow: auto;
+                background: #1a1a28;
+                -webkit-overflow-scrolling: touch
+            }
+
+            .pdf-canvas-wrap {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 6px;
+                padding: 8px
+            }
+
+            .pdf-page-canvas {
+                display: block;
+                box-shadow: 0 2px 12px rgba(0,0,0,.5)
+            }
+
+            .pdf-loading,.pdf-err {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 200px;
+                gap: 12px;
+                padding: 20px;
+                text-align: center
+            }
+
+            .pdf-loading .spinner {
+                border-top-color: var(--note)
+            }
+
+            .pdf-loading p,.pdf-err p {
+                font-size: 13px;
+                color: var(--muted);
+                line-height: 1.5
+            }
+
+            .pdf-err a {
+                color: var(--note);
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none
+            }
+
+            .no-items {
+                text-align: center;
+                padding: 36px 16px;
+                color: var(--muted);
+                font-size: 14px
+            }
+
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg)
+                }
+            }
+
+            @keyframes blink {
+                0%,50% {
+                    opacity: 1
+                }
+
+                51%,100% {
+                    opacity: .2
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="shell">
+            <div id="main-row">
+                <div id="video-col">
+                    <div id="vid-box">
+                        <video id="vid" playsinline preload="auto"></video>
+                        <div class="ov" id="ovLoad">
+                            <div class="spinner"></div>
+                            <p id="loadMsg">Initializing…</p>
+                        </div>
+                        <div class="ov" id="ovErr">
+                            <span style="font-size:28px">⚠️</span>
+                            <p id="errMsg">Something went wrong.</p>
+                            <button id="retryBtn">Retry</button>
+                        </div>
+                        <div id="bufSpin"></div>
+                    </div>
+                    <div id="tap-shield"></div>
+                    <div id="ctrl-overlay" class="visible">
+                        <div id="player-header">
+                            <button class="hdr-back" onclick="history.back()">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M19 12H5"/>
+                                    <path d="M12 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                            <div id="player-title"></div>
+                            <div id="tdBtn">
+                                <svg viewBox="0 0 24 24">
+                                    <path fill-rule="evenodd" d="M10.5 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm0 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm0 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z" clip-rule="evenodd"/>
+                                </svg>
+                                <div id="tdMenu">
+                                    <div class="tdm-row" id="tdTimeline">
+                                        <svg viewBox="0 0 24 24" stroke-width="1.5">
+                                            <path d="M3.167 5.583a.083.083 0 01.166 0v12.834a.083.083 0 01-.167 0V5.583zM5.667 17.333a1 1 0 001 1h10.666a1 1 0 001-1V6.667a1 1 0 00-1-1H6.667a1 1 0 00-1 1v10.666zm4.888-3.3V9.966L13.945 12l-3.39 2.034zM20.666 5.583a.083.083 0 11.167 0v12.834a.083.083 0 01-.166 0V5.583z"/>
+                                        </svg>
+                                        Timeline
+                                    </div>
+                                    <div class="tdm-row" id="tdAttach">
+                                        <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
+                                        </svg>
+                                        Attachments
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="ctrl-mid"></div>
+                        <div id="player-footer">
+                            <div class="prog-wrap">
+                                <div class="time-row">
+                                    <div class="t-left">
+                                        <span class="t-time" id="curTime">0:00</span>
+                                        <span class="spd-badge" id="spdBadge">1x</span>
+                                        <div class="live-badge" id="liveBadge">
+                                            <div class="live-dot"></div>
+                                            LIVE
+                                        </div>
+                                    </div>
+                                    <span class="t-time" id="durTime">0:00</span>
+                                </div>
+                                <div class="bar-wrap">
+                                    <div class="bar-bg">
+                                        <div class="bar-buf" id="barBuf" style="width:0%"></div>
+                                        <div class="bar-fill" id="barFill" style="width:0%"></div>
+                                    </div>
+                                    <div class="bar-thumb" id="barThumb" style="left:0%"></div>
+                                    <input type="range" class="bar-input" id="seekBar" min="0" max="1000" step="1" value="0">
+                                </div>
+                            </div>
+                            <div class="btn-row">
+                                <div class="btn-l">
+                                    <button class="cbtn" id="playBtn">
+                                        <svg id="iPlay" width="34" height="34" viewBox="0 0 24 24" fill="white">
+                                            <path d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z"/>
+                                        </svg>
+                                        <svg id="iPause" width="34" height="34" viewBox="0 0 24 24" fill="white" style="display:none">
+                                            <path fill-rule="evenodd" d="M6.75 5.25a.75.75 0 01.75-.75H9a.75.75 0 01.75.75v13.5a.75.75 0 01-.75.75H7.5a.75.75 0 01-.75-.75V5.25zm7.5 0A.75.75 0 0115 4.5h1.5a.75.75 0 01.75.75v13.5a.75.75 0 01-.75.75H15a.75.75 0 01-.75-.75V5.25z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
+                                    <button class="cbtn" id="rwBtn">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                            <path d="M12.5 3.5c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36l-1.52.88c.39.15.62.48.62.88 0 3.87-3.13 7-7 7s-7-3.13-7-7 3.13-7 7-7c1.93 0 3.68.78 4.95 2.05L16 12h5V7l-1.55 1.55C17.75 6.85 15.25 5.5 12.5 3.5zM10 12V17l4-2.5L10 12z"/>
+                                        </svg>
+                                    </button>
+                                    <button class="cbtn" id="fwBtn">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                            <path d="M11.5 3.5c4.97 0 9 4.03 9 9s-4.03 9-9 9-9-4.03-9-9c0-.46.04-.92.1-1.36l1.52.88c-.39.15-.62.48-.62.88 0 3.87 3.13 7 7 7s7-3.13 7-7-3.13-7-7-7c-1.93 0-3.68.78-4.95 2.05L8 12H3V7l1.55 1.55C6.25 6.85 8.75 5.5 11.5 3.5zM14 12v5l-4-2.5 4-2.5z"/>
+                                        </svg>
+                                    </button>
+                                    <div class="vol-grp">
+                                        <button class="cbtn" id="muteBtn">
+                                            <svg id="iVol" width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                                            </svg>
+                                        </button>
+                                        <input type="range" class="vol-range" id="volBar" min="0" max="100" value="100">
+                                    </div>
+                                </div>
+                                <div class="btn-r">
+                                    <button class="cbtn" id="settBtn">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                            <path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/>
+                                            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+                                        </svg>
+                                    </button>
+                                    <button class="cbtn" id="fsBtn">
+                                        <svg id="iFs" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                            <path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="settBd"></div>
+                        <div id="settPanel">
+                            <div class="sc">
+                                <div class="s-main" id="sMain">
+                                    <div class="s-row" id="sSpeedRow">
+                                        <span class="s-lbl">Speed</span>
+                                        <div class="s-val">
+                                            <span id="sSpeedVal">Normal</span>
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2.5">
+                                                <path d="M9 18l6-6-6-6"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="s-row" id="sQualRow">
+                                        <span class="s-lbl">Quality</span>
+                                        <div class="s-val">
+                                            <span id="sQualVal">Auto</span>
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2.5">
+                                                <path d="M9 18l6-6-6-6"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="s-sub" id="sSpeedSub">
+                                    <div class="s-back" id="sSpeedBack">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                                            <path d="M15 18l-6-6 6-6"/>
+                                        </svg>
+                                        <span>Speed</span>
+                                    </div>
+                                    <div class="s-scroll" id="sSpeedOpts"></div>
+                                </div>
+                                <div class="s-sub" id="sQualSub">
+                                    <div class="s-back" id="sQualBack">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                                            <path d="M15 18l-6-6 6-6"/>
+                                        </svg>
+                                        <span>Quality</span>
+                                    </div>
+                                    <div class="s-scroll" id="sQualOpts"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="side-panel">
+                    <div class="panel-inner" id="panelInner"></div>
+                </div>
+            </div>
+            <div id="bottom-panel">
+                <div class="panel-inner" id="panelInnerMob"></div>
+            </div>
+        </div>
+
+        <script>
+            (function() {
+                const params = new URLSearchParams(window.location.search);
+                const scheduleId = params.get('scheduleId');
+                const batchId = params.get('batchId');
+                const subjectId = params.get('subjectId');
+                
+                // DYNAMIC TOKEN: Try to get from URL first, fallback to hardcoded (for testing)
+                let MEDIA_TOKEN = params.get('mediaToken') || "8Sbf0Y2UObtsy34z3TA4p1T3sRpXqNVMULMMrc2zr0E5ZGv-2NHp1cplKWGbvE2V0br8JD3Ia7oCafGCnpTlpVeyob2s3Mztlz9MHoy_Pkvx65tYh_HgOre7Jvxzj3g_NGC5EpCxqUGJ3Fz8rJ6Q2eL6irmU4WGBFUWMPmBTD3OAKTOb3JOGQ6DKfxDm5Q45nkBoVeeTl9DPq13nRUiOvJwL9uF3nvVuREl3urYhVinJUZ9J5i3DTejaYXnNTKGn7Xl89xUJ6Hb4zHDODAxsqpIiOHIVfocsRqVHsBkQKpeegxgWZZQVBVOKptOIwYGL7Tmr1beCMeZPVheV31YAH7axgJSgtAVksh4qS4FWOlz7km8Kikc0YVU4qQAOlHE9ptghbwIX4jYCKiCIab6mgH-Lu0bSbiP6g5sCPPHYhiMtYhyBxjz3xFszh1x1L1HTPwQNiFPIB_pbN3jnAd3bZ0H1KaVrdR-HW2H0yn4zChLOM8iKtgX-VUIXWXW4lieCdhet3FTNAFnUqZ5atk0gblRKKocZV3Vhuvav2BwAzys";
+
+                const PW_HEADERS = {
+                    "Accept-Encoding": "gzip",
+                    "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 11; SM-A707F Build/RP1A.200720.012)",
+                    "authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3ODI4ODA3NzUuMTU1LCJkYXRhIjp7Il9pZCI6IjYxMzlkZGI2ZDljZmEzMDAxODEzOGJmZiIsInVzZXJuYW1lIjoiODExNTcwNzY1OSIsImZpcnN0TmFtZSI6Ik1vaGl0IiwibGFzdE5hbWUiOiJLdW1hciBHdXB0YSIsIm9yZ2FuaXphdGlvbiI6eyJfaWQiOiI1ZWIzOTNlZTk1ZmFiNzQ2OGE3OWQxODkiLCJ3ZWJzaXRlIjoicGh5c2ljc3dhbGxhaC5jb20iLCJuYW1lIjoiUGh5c2ljc3dhbGxhaCJ9LCJlbWFpbCI6bnVsbCwicm9sZXMiOlsiNWIyN2JkOTY1ODQyZjk1MGE3NzhjNmVmIl0sImNvdW50cnlHcm91cCI6IklOIiwidHlwZSI6IlVTRVIifSwianRpIjoickQwdHVHTmhUektuSzJELXJSdVEtZ182MTM5ZGRiNmQ5Y2ZhMzAwMTgxMzhiZmYiLCJpYXQiOjE3ODIyNzU5NzV9.8W3qjF4tHz7qnbf2L-hydaLAgdZ3WZcIGugLqGkzt6U",
+                    "client-id": "ADMIN",
+                    "client-type": "MOBILE",
+                    "client-version": "538",
+                    "content-type": "application/json",
+                    "device-meta": JSON.stringify({
+                        APP_VERSION: "538",
+                        APP_VERSION_NAME: "15.32.0",
+                        DEVICE_MAKE: "Samsung",
+                        DEVICE_MODEL: "SM-A707F",
+                        OS_VERSION: "11",
+                        PACKAGE_NAME: "xyz.penpencil.physicswala",
+                        network: "wifi_data",
+                        carrier: "UNDEFINED"
+                    }),
+                    "randomid": "3d3b49f068728fa3",
+                    "referer": "https://android.pw.live"
+                };
+
+                const vid = document.getElementById('vid');
+                const ovLoad = document.getElementById('ovLoad');
+                const ovErr = document.getElementById('ovErr');
+                const loadMsg = document.getElementById('loadMsg');
+                const errMsg = document.getElementById('errMsg');
+                const retryBtn = document.getElementById('retryBtn');
+                const playBtn = document.getElementById('playBtn');
+                const iPlay = document.getElementById('iPlay');
+                const iPause = document.getElementById('iPause');
+                const curTime = document.getElementById('curTime');
+                const durTime = document.getElementById('durTime');
+                const seekBar = document.getElementById('seekBar');
+                const barFill = document.getElementById('barFill');
+                const barBuf = document.getElementById('barBuf');
+                const barThumb = document.getElementById('barThumb');
+                const volBar = document.getElementById('volBar');
+                const muteBtn = document.getElementById('muteBtn');
+                const iVol = document.getElementById('iVol');
+                const settBtn = document.getElementById('settBtn');
+                const settPanel = document.getElementById('settPanel');
+                const settBd = document.getElementById('settBd');
+                const sMain = document.getElementById('sMain');
+                const sSpeedSub = document.getElementById('sSpeedSub');
+                const sQualSub = document.getElementById('sQualSub');
+                const spdBadge = document.getElementById('spdBadge');
+                const fsBtn = document.getElementById('fsBtn');
+                const iFs = document.getElementById('iFs');
+
+                let hlsInst = null;
+                let shakaInst = null;
+                let isLive = false;
+                let settOpen = false;
+                let hideTimer = null;
+                let wasPlaying = false;
+                let isSeeking = false;
+
+                function fmt(s) {
+                    s = Math.floor(s || 0);
+                    const h = Math.floor(s / 3600);
+                    const m = Math.floor((s % 3600) / 60);
+                    const sc = s % 60;
+                    return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${String(sc).padStart(2, '0')}` : `${m}:${String(sc).padStart(2, '0')}`;
+                }
+
+                function showLoading(m) {
+                    ovLoad.classList.remove('off');
+                    loadMsg.textContent = m || 'Loading…';
+                    ovErr.classList.remove('on');
+                }
+
+                function hideLoading() {
+                    ovLoad.classList.add('off');
+                }
+
+                function showError(m) {
+                    hideLoading();
+                    ovErr.classList.add('on');
+                    errMsg.textContent = m || 'Something went wrong.';
+                }
+
+                async function boot() {
+                    showLoading('Resolving video…');
+                    try {
+                        if (!MEDIA_TOKEN) throw new Error('Media token not available.');
+                        
+                        const container = /iPad|iPhone|iPod/.test(navigator.userAgent) ? 'HLS' : 'DASH';
+                        const res = await fetch(`https://api.penpencil.co/v1/videos/video-url-details?mediaToken=${encodeURIComponent(MEDIA_TOKEN)}&videoContainerType=${container}`, {
+                            headers: PW_HEADERS
+                        });
+
+                        if (!res.ok) {
+                            const errorJson = await res.json().catch(() => ({}));
+                            throw new Error(errorJson.message || `Failed to resolve video (${res.status}).`);
+                        }
+
+                        const json = await res.json();
+                        if (!json.success || !json.data?.url) throw new Error(json.message || 'Video not available.');
+
+                        initPlayer(json.data);
+                    } catch (err) {
+                        showError(err.message);
+                    }
+                }
+
+                async function initPlayer(data) {
+                    showLoading('Initializing player…');
+                    const url = data.url;
+                    
+                    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                        initYT(url);
+                    } else if (url.endsWith('.m3u8')) {
+                        initHLS(url);
+                    } else if (url.endsWith('.mpd')) {
+                        initDASH(url);
+                    } else {
+                        initProgressive(url);
+                    }
+                }
+
+                function initYT(url) {
+                    const id = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/)?.[1];
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&modestbranding=1&rel=0`;
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.border = 'none';
+                    document.getElementById('vid-box').appendChild(iframe);
+                    hideLoading();
+                }
+
+                function initHLS(url) {
+                    if (Hls.isSupported()) {
+                        hlsInst = new Hls();
+                        hlsInst.loadSource(url);
+                        hlsInst.attachMedia(vid);
+                        hlsInst.on(Hls.Events.MANIFEST_PARSED, () => {
+                            hideLoading();
+                            vid.play();
+                        });
+                    } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
+                        vid.src = url;
+                        vid.addEventListener('loadedmetadata', () => {
+                            hideLoading();
+                            vid.play();
+                        });
+                    }
+                }
+
+                async function initDASH(url) {
+                    shaka.polyfil.installAll();
+                    if (shaka.Player.isBrowserSupported()) {
+                        shakaInst = new shaka.Player(vid);
+                        try {
+                            await shakaInst.load(url);
+                            hideLoading();
+                            vid.play();
+                        } catch (e) {
+                            showError('DASH load failed: ' + e.message);
+                        }
+                    } else {
+                        showError('DASH not supported in this browser.');
+                    }
+                }
+
+                function initProgressive(url) {
+                    vid.src = url;
+                    vid.load();
+                    vid.addEventListener('canplay', () => {
+                        hideLoading();
+                        vid.play();
+                    });
+                    vid.addEventListener('error', () => showError('Progressive playback failed.'));
+                }
+
+                // Controls Logic
+                playBtn.addEventListener('click', () => {
+                    if (vid.paused) vid.play();
+                    else vid.pause();
+                });
+
+                vid.addEventListener('play', () => {
+                    iPlay.style.display = 'none';
+                    iPause.style.display = 'block';
+                });
+
+                vid.addEventListener('pause', () => {
+                    iPlay.style.display = 'block';
+                    iPause.style.display = 'none';
+                });
+
+                vid.addEventListener('timeupdate', () => {
+                    if (!isSeeking) {
+                        const p = (vid.currentTime / vid.duration) * 100;
+                        barFill.style.width = p + '%';
+                        barThumb.style.left = p + '%';
+                        seekBar.value = (vid.currentTime / vid.duration) * 1000;
+                        curTime.textContent = fmt(vid.currentTime);
+                    }
+                });
+
+                vid.addEventListener('loadedmetadata', () => {
+                    durTime.textContent = fmt(vid.duration);
+                });
+
+                seekBar.addEventListener('input', () => {
+                    isSeeking = true;
+                    const time = (seekBar.value / 1000) * vid.duration;
+                    curTime.textContent = fmt(time);
+                    const p = (seekBar.value / 1000) * 100;
+                    barFill.style.width = p + '%';
+                    barThumb.style.left = p + '%';
+                });
+
+                seekBar.addEventListener('change', () => {
+                    isSeeking = false;
+                    vid.currentTime = (seekBar.value / 1000) * vid.duration;
+                });
+
+                volBar.addEventListener('input', () => {
+                    vid.volume = volBar.value / 100;
+                    vid.muted = vid.volume === 0;
+                });
+
+                muteBtn.addEventListener('click', () => {
+                    vid.muted = !vid.muted;
+                    volBar.value = vid.muted ? 0 : vid.volume * 100;
+                });
+
+                fsBtn.addEventListener('click', () => {
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen();
+                    } else {
+                        document.exitFullscreen();
+                    }
+                });
+
+                retryBtn.addEventListener('click', () => boot());
+
+                // Start
+                boot();
+            })();
+        </script>
+    </body>
+</html>
+
+<!--<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <title>Motion in a Straight Line 05 : Homework Questions || Questions on Distance and Displacement || Speed and Velocity || Questions on Speed and Velocity</title>
+        <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.min.js"></script>
+        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+        <style>
+            *,*::before,*::after {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                -webkit-tap-highlight-color: transparent;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                user-select: none
+            }
             :root {
                 --accent: #5a4bda;
                 --bg: #000;
@@ -3082,4 +4540,4 @@
         </script>
         <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"a870477babf4472d87cfe5347ff3f376","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
     </body>
-</html>
+</html>-->
