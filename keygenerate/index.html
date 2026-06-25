@@ -142,7 +142,7 @@
     // Load config
     async function loadConfig() {
         try {
-            const response = await fetch('https://rarestudy.in/api/config');
+            const response = await fetch('/api/config');
             config = await response.json();
             document.getElementById('how-to-btn').href = config.how_to_generate_url;
         } catch (error) {
