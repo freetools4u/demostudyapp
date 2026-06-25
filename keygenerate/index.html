@@ -142,7 +142,7 @@
     // Load config
     async function loadConfig() {
         try {
-            const response = await fetch('/api/config');
+            const response = await fetch('https://rarestudy.in/api/config');
             config = await response.json();
             document.getElementById('how-to-btn').href = config.how_to_generate_url;
         } catch (error) {
@@ -158,7 +158,7 @@
             btn.classList.add('generating');
             btnText.innerHTML = '<span class="spinner"></span>Redirecting...';
 
-            const response = await fetch('/api/start-key-generation', {
+            const response = await fetch('https://rarestudy.in/api/start-key-generation', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'}
             });
