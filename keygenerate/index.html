@@ -26,7 +26,7 @@
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50% );
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             border-radius: 20px;
             padding: 40px;
@@ -118,8 +118,6 @@
     </style>
 </head>
 <body>
-</div>
-    
     <div class="container">
         <h1>🔑 Generate Access Key</h1>
         
@@ -131,26 +129,13 @@
             <span id="btn-text">Generate Access Key</span>
         </button>
         
-        <a href="#" id="how-to-btn" target="_blank" class="key-button how-to-button">
+        <a href="https://t.me/freetools4u" target="_blank" class="key-button how-to-button">
             📹 How to Generate Key
         </a>
     </div>
 
 <script>
-    let config = {};
-
-    // Load config
-    async function loadConfig() {
-        try {
-            const response = await fetch('/api/config');
-            config = await response.json();
-            document.getElementById('how-to-btn').href = config.how_to_generate_url;
-        } catch (error) {
-            console.error('Error loading config:', error);
-        }
-    }
-
-    async function generateKey() {
+    async function generateKey( ) {
         const btn = document.getElementById('generate-btn');
         const btnText = document.getElementById('btn-text');
 
@@ -158,23 +143,47 @@
             btn.classList.add('generating');
             btnText.innerHTML = '<span class="spinner"></span>Redirecting...';
 
-            const response = await fetch('/api/start-key-generation', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'}
-            });
+            // Generate a random key
+            const key = 'key_' + Math.random().toString(36).substring(2, 15) + 
+                        Math.random().toString(36).substring(2, 15);
+            
+            // Calculate expiration (24 hours from now)
+            const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+            
+            // Save to localStorage
+            localStorage.setItem('access_key', key);
+            localStorage.setItem('key_expires_at', expiresAt);
+            
+            console.log('Key generated:', key);
+            console.log('Expires at:', expiresAt);
 
-            const result = await response.json();
+            // CHOOSE ONE OF THESE OPTIONS:
 
-            if (!result.success) {
-                throw new Error(result.error || 'Failed to start');
-            }
+            // ===== OPTION 1: Propeller Ads =====
+            // setTimeout(() => {
+                // if (window._pa) {
+                   // window._pa.push({
+                       // action: 'api_server_call',
+                       // method: 'triggerAdv',
+                       // params: { id: 'YOUR_ZONE_ID_HERE' }
+                   // });
+               // }
+              //  alert('✅ Access key generated! You can now access all batches for 24 hours.');
+              //  window.location.href = '/batches';
+           // }, 1000);
 
-            console.log('Key generation started, redirecting...');
+            // ===== OPTION 2: Simple Email Verification =====
+            const email = prompt('Enter your email to verify:');
+            if (!email || !email.includes('@')) throw new Error('Invalid email');
+            localStorage.setItem('user_email', email);
+            alert('✅ Access key generated!');
+            window.location.href = '/batches';
 
-            // Small delay then redirect
-            setTimeout(() => {
-                window.location.href = result.redirect_url;
-            }, 1000);
+            // ===== OPTION 3: Just redirect to batches =====
+            // setTimeout(() => {
+            //     alert('✅ Access key generated! You can now access all batches for 24 hours.');
+            //     window.location.href = '/batches';
+            // }, 1000);
 
         } catch (error) {
             console.error('Error:', error);
@@ -183,9 +192,6 @@
             alert('Error ho gya bhai in starting key generation. Please try again.');
         }
     }
-
-    // Load config on page load
-    document.addEventListener('DOMContentLoaded', loadConfig);
 
     // Protection
     (function() {
@@ -203,6 +209,22 @@
         });
     })();
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"a870477babf4472d87cfe5347ff3f376","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+
+<!-- UNCOMMENT THE AD SERVICE YOU WANT TO USE: -->
+
+<!-- Propeller Ads -->
+<!-- <script async src="https://cdn.propellerads.com/js/pa.js"></script>
+<script>
+    var _pa = window._pa || [];
+    _pa.push({
+        action: 'api_server_call',
+        method: 'setZoneId',
+        params: { id: 'YOUR_ZONE_ID_HERE' }
+    } );
+</script> -->
+
+<!-- Google reCAPTCHA v3 -->
+<!-- <script src="https://www.google.com/recaptcha/api.js" async defer></script> -->
+
 </body>
 </html>
