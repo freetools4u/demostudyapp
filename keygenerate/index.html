@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Access Key — rarestudy</title>
+    <link rel="icon" type="image/png" href="https://rarestudy.in/static/site_logo.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: Inter, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            overflow: hidden;
+        }
+
+        .container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+        }
+
+        h1 {
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+            font-weight: 800;
+        }
+
+        .instruction {
+            font-size: 1em;
+            color: #94a3b8;
+            margin: 20px 0;
+            line-height: 1.6;
+            background: rgba(30, 41, 59, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #6366f1;
+        }
+
+        .key-button {
+            display: block;
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            padding: 16px 32px;
+            text-decoration: none;
+            border-radius: 15px;
+            font-weight: 700;
+            margin: 20px auto;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .key-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.4);
+        }
+
+        .how-to-button {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3) !important;
+        }
+
+        .how-to-button:hover {
+            box-shadow: 0 12px 35px rgba(245, 158, 11, 0.4) !important;
+        }
+
+        .generating {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            pointer-events: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #334155;
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 25px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+</div>
+    
+    <div class="container">
+        <h1>🔑 Generate Access Key</h1>
+        
+        <div class="instruction">
+            Click the button below to generate your access key. You will be redirected to a verification page. Complete the process and return here for full access.
+        </div>
+        
+        <button id="generate-btn" class="key-button" onclick="generateKey()">
+            <span id="btn-text">Generate Access Key</span>
+        </button>
+        
+        <a href="#" id="how-to-btn" target="_blank" class="key-button how-to-button">
+            📹 How to Generate Key
+        </a>
+    </div>
+
+<script>
+    let config = {};
+
+    // Load config
+    async function loadConfig() {
+        try {
+            const response = await fetch('/api/config');
+            config = await response.json();
+            document.getElementById('how-to-btn').href = config.how_to_generate_url;
+        } catch (error) {
+            console.error('Error loading config:', error);
+        }
+    }
+
+    async function generateKey() {
+        const btn = document.getElementById('generate-btn');
+        const btnText = document.getElementById('btn-text');
+
+        try {
+            btn.classList.add('generating');
+            btnText.innerHTML = '<span class="spinner"></span>Redirecting...';
+
+            const response = await fetch('/api/start-key-generation', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to start');
+            }
+
+            console.log('Key generation started, redirecting...');
+
+            // Small delay then redirect
+            setTimeout(() => {
+                window.location.href = result.redirect_url;
+            }, 1000);
+
+        } catch (error) {
+            console.error('Error:', error);
+            btn.classList.remove('generating');
+            btnText.textContent = 'Generate Access Key';
+            alert('Error starting key generation. Please try again.');
+        }
+    }
+
+    // Load config on page load
+    document.addEventListener('DOMContentLoaded', loadConfig);
+
+    // Protection
+    (function() {
+        'use strict';
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('selectstart', e => e.preventDefault());
+        document.addEventListener('copy', e => e.preventDefault());
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' ||
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+                (e.ctrlKey && e.key === 'U')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    })();
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"a870477babf4472d87cfe5347ff3f376","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
