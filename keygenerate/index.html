@@ -158,7 +158,7 @@
             btn.classList.add('generating');
             btnText.innerHTML = '<span class="spinner"></span>Redirecting...';
 
-            const response = await fetch('https://rarestudy.in/api/start-key-generation', {
+            const response = await fetch('/api/start-key-generation', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'}
             });
