@@ -3,6 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Access Key</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Inter, sans-serif; 
+            background: #0f172a; 
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            text-align: center;
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid #334155;
+            max-width: 500px;
+        }
+        h1 { font-size: 28px; margin-bottom: 20px; }
+        p { color: #94a3b8; margin-bottom: 30px; line-height: 1.6; }
+        button {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover { transform: translateY(-2px); }
+        button:active { transform: scale(0.98); }
+        .status { margin-top: 20px; color: #64748b; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔑 Generate Access Key</h1>
+        <p>Click the button below to generate your 24-hour access key.</p>
+        <button id="generateBtn" onclick="generateKey()">Generate Access Key</button>
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        function generateKey() {
+            const btn = document.getElementById('generateBtn');
+            const status = document.getElementById('status');
+            
+            try {
+                btn.disabled = true;
+                btn.textContent = '⏳ Generating...';
+                status.textContent = 'Setting up your session...';
+                
+                // Generate session token
+                const sessionToken = 'session_' + Math.random().toString(36).substring(2, 15) + 
+                                    Math.random().toString(36).substring(2, 15);
+                
+                // Calculate 24-hour expiration
+                const expiresIn24Hours = Date.now() + (24 * 60 * 60 * 1000);
+                const expirationDate = new Date(expiresIn24Hours).toUTCString();
+                
+                // Save to localStorage
+                localStorage.setItem('session', sessionToken);
+                localStorage.setItem('key_expires_at', new Date(expiresIn24Hours).toISOString());
+                
+                // Save to cookies
+                document.cookie = `session_expiry=${expiresIn24Hours}; expires=${expirationDate}; path=/`;
+                
+                console.log('✅ Session created:');
+                console.log('Token:', sessionToken);
+                console.log('Expires:', new Date(expiresIn24Hours).toISOString());
+                console.log('Cookies:', document.cookie);
+                
+                // Wait a bit then redirect
+                setTimeout(() => {
+                    status.textContent = 'Redirecting to batches...';
+                    window.location.href = '/demostudyapp/batches.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                btn.disabled = false;
+                btn.textContent = 'Generate Access Key';
+                status.textContent = '❌ Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generate Access Key — rarestudy</title>
     <link rel="icon" type="image/png" href="https://rarestudy.in/static/site_logo.png">
     <style>
@@ -210,7 +309,7 @@
 </script> -->
 
 <!-- Google reCAPTCHA v3 -->
-<!-- <script src="https://www.google.com/recaptcha/api.js" async defer></script> -->
+<!-- <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 </body>
-</html>
+</html>-->
